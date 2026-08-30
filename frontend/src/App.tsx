@@ -8,6 +8,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { EntriesPage } from "./pages/EntriesPage";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
+import { RendaPage } from "./pages/RendaPage";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 
 export function App() {
@@ -20,6 +21,7 @@ export function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
             <Route path="/" element={<DashboardPage />} />
+            <Route path="/renda" element={<RendaPage />} />
             <Route path="/entries" element={<EntriesPage />} />
             <Route path="/budgets" element={<BudgetsPage />} />
             <Route path="/accounts" element={<AccountsPage />} />

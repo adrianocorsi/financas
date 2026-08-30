@@ -125,7 +125,12 @@ export function DashboardPage() {
       .finally(() => setLoading(false));
   }, [month, year]);
 
-  const diferenca = resumo ? resumo.saldoRealizado - resumo.saldoPrevisto : 0;
+  // Orçado/Realizado/Diferença são sobre DESPESA, não saldo (receita − despesa).
+  // Orçado = soma de todas as despesas do mês (pagas + pendentes); Realizado = só as pagas;
+  // Diferença = orçado − realizado = quanto ainda falta pagar.
+  const orcado = resumo?.totalDespesasPrevistas ?? 0;
+  const realizado = resumo?.totalDespesasRealizadas ?? 0;
+  const diferenca = orcado - realizado;
 
   return (
     <>
@@ -173,21 +178,21 @@ export function DashboardPage() {
       {!loading && resumo && (
         <div className="grid-cards">
           <div className="card stat-card">
-            <p className="label">Previsto</p>
-            <p className="value">{formatCurrency(resumo.saldoPrevisto)}</p>
-            <p className="hint">receitas − despesas do mês inteiro (pagas + pendentes)</p>
+            <p className="label">Orçado</p>
+            <p className="value">{formatCurrency(orcado)}</p>
+            <p className="hint">soma de todas as despesas do mês (pagas + pendentes)</p>
           </div>
           <div className="card stat-card">
             <p className="label">Realizado</p>
-            <p className="value">{formatCurrency(resumo.saldoRealizado)}</p>
-            <p className="hint">só o que já foi pago/recebido até agora</p>
+            <p className="value">{formatCurrency(realizado)}</p>
+            <p className="hint">soma das despesas já pagas</p>
           </div>
           <div className="card stat-card">
             <p className="label">Diferença</p>
             <p className={`value ${diferenca >= 0 ? "value-positive" : "value-negative"}`}>
               {formatCurrency(diferenca)}
             </p>
-            <p className="hint">realizado − previsto: o que ainda falta acontecer</p>
+            <p className="hint">orçado − realizado: o que ainda falta pagar</p>
           </div>
         </div>
       )}

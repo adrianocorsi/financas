@@ -86,7 +86,15 @@ export async function generateEntriesForMonth(userId: string, month: number, yea
       });
       if (alreadyExists) continue;
 
-      const status = computeEntryStatus({ paidDate: null, dueDate, currentStatus: "pendente" });
+      // Receita recorrente (salário etc.) nasce já como "pago": o usuário pediu para não
+      // precisar dar baixa manual todo mês nisso — se o valor mudar, ele edita a recorrência
+      // (Renda) e o próximo mês gerado já sai com o valor novo. Despesa continua exigindo
+      // baixa manual normalmente, pois isso é o que a spec e o resto do app esperam rastrear.
+      const isReceitaAutoRealizada = recurrence.type === "receita";
+      const status = isReceitaAutoRealizada
+        ? "pago"
+        : computeEntryStatus({ paidDate: null, dueDate, currentStatus: "pendente" });
+
       const entry = await Entry.create({
         userId,
         accountId: recurrence.accountId,
@@ -94,9 +102,9 @@ export async function generateEntriesForMonth(userId: string, month: number, yea
         description: recurrence.description,
         type: recurrence.type,
         amountExpected: recurrence.amount,
-        amountPaid: null,
+        amountPaid: isReceitaAutoRealizada ? recurrence.amount : null,
         dueDate,
-        paidDate: null,
+        paidDate: isReceitaAutoRealizada ? dueDate : null,
         competenceMonth: month,
         competenceYear: year,
         status,

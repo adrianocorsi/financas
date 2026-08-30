@@ -331,7 +331,18 @@ export function EntriesPage() {
             </label>
             <label>
               Tipo
-              <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as EntryType })}>
+              <select
+                value={form.type}
+                onChange={(e) => {
+                  const newType = e.target.value as EntryType;
+                  // Categoria pertence a um tipo específico — trocar o tipo sem realinhar a
+                  // categoria deixava o categoryId antigo "pendurado", salvando uma categoria
+                  // de despesa num lançamento de receita (ou vice-versa) sem o usuário notar.
+                  const stillValid = categories.some((c) => c._id === form.categoryId && c.type === newType);
+                  const fallback = categories.find((c) => c.type === newType)?._id ?? "";
+                  setForm({ ...form, type: newType, categoryId: stillValid ? form.categoryId : fallback });
+                }}
+              >
                 <option value="despesa">Despesa</option>
                 <option value="receita">Receita</option>
               </select>
