@@ -97,38 +97,40 @@ export function BudgetsPage() {
       ) : status.length === 0 ? (
         <p className="empty-state">Nenhum orçamento definido para este mês</p>
       ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Categoria</th>
-              <th>Planejado</th>
-              <th>Gasto real</th>
-              <th>% utilizado</th>
-              <th>Situação</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {status.map((item) => (
-              <tr key={item.budgetId}>
-                <td>{item.categoryName ?? "—"}</td>
-                <td>{formatCurrency(item.plannedAmount)}</td>
-                <td>{formatCurrency(item.gastoReal)}</td>
-                <td>{item.percentualUtilizado.toFixed(0)}%</td>
-                <td>
-                  <span className={`badge ${item.estourado ? "badge-atrasado" : "badge-pago"}`}>
-                    {item.estourado ? "Estourado" : "Dentro do previsto"}
-                  </span>
-                </td>
-                <td>
-                  <button className="btn btn-sm btn-danger" onClick={() => handleDelete(item.budgetId)}>
-                    Excluir
-                  </button>
-                </td>
+        <div className="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Categoria</th>
+                <th className="hide-mobile">Planejado</th>
+                <th>Gasto real</th>
+                <th className="hide-mobile">% utilizado</th>
+                <th>Situação</th>
+                <th>Ações</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {status.map((item) => (
+                <tr key={item.budgetId}>
+                  <td>{item.categoryName ?? "—"}</td>
+                  <td className="hide-mobile">{formatCurrency(item.plannedAmount)}</td>
+                  <td>{formatCurrency(item.gastoReal)}</td>
+                  <td className="hide-mobile">{item.percentualUtilizado.toFixed(0)}%</td>
+                  <td>
+                    <span className={`badge ${item.estourado ? "badge-atrasado" : "badge-pago"}`}>
+                      {item.estourado ? "Estourado" : "Dentro do previsto"}
+                    </span>
+                  </td>
+                  <td>
+                    <button className="btn btn-sm btn-danger" onClick={() => handleDelete(item.budgetId)}>
+                      Excluir
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </>
   );

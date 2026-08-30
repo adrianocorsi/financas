@@ -66,40 +66,42 @@ export function CategoriesPage() {
       {categories.length === 0 ? (
         <p className="empty-state">Nenhuma categoria cadastrada</p>
       ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Tipo</th>
-              <th>Cor</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {categories.map((category) => (
-              <tr key={category._id}>
-                <td>{category.name}</td>
-                <td>{category.type === "despesa" ? "Despesa" : "Receita"}</td>
-                <td>
-                  <span
-                    style={{
-                      display: "inline-block",
-                      width: 14,
-                      height: 14,
-                      borderRadius: "50%",
-                      background: category.color ?? "#ccc",
-                    }}
-                  />
-                </td>
-                <td>
-                  <button className="btn btn-sm btn-danger" onClick={() => handleDelete(category._id)}>
-                    Excluir
-                  </button>
-                </td>
+        <div className="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Cor</th>
+                <th>Ações</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {categories.map((category) => (
+                <tr key={category._id}>
+                  <td>{category.name}</td>
+                  <td>{category.type === "despesa" ? "Despesa" : "Receita"}</td>
+                  <td>
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: 14,
+                        height: 14,
+                        borderRadius: "50%",
+                        background: category.color ?? "#ccc",
+                      }}
+                    />
+                  </td>
+                  <td>
+                    <button className="btn btn-sm btn-danger" onClick={() => handleDelete(category._id)}>
+                      Excluir
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </>
   );

@@ -90,40 +90,42 @@ export function AccountsPage() {
       {accounts.length === 0 ? (
         <p className="empty-state">Nenhuma conta cadastrada</p>
       ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Tipo</th>
-              <th>Saldo inicial</th>
-              <th>Saldo atual</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {accounts.map((account) => (
-              <tr key={account._id}>
-                <td>{account.name}</td>
-                <td>{TYPE_LABELS[account.type]}</td>
-                <td>{formatCurrency(account.initialBalance)}</td>
-                <td>
-                  {balances[account._id] != null ? (
-                    formatCurrency(balances[account._id])
-                  ) : (
-                    <button className="btn btn-sm" onClick={() => loadBalance(account._id)}>
-                      Calcular
-                    </button>
-                  )}
-                </td>
-                <td>
-                  <button className="btn btn-sm btn-danger" onClick={() => handleDelete(account._id)}>
-                    Excluir
-                  </button>
-                </td>
+        <div className="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th className="hide-mobile">Tipo</th>
+                <th className="hide-mobile">Saldo inicial</th>
+                <th>Saldo atual</th>
+                <th>Ações</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {accounts.map((account) => (
+                <tr key={account._id}>
+                  <td>{account.name}</td>
+                  <td className="hide-mobile">{TYPE_LABELS[account.type]}</td>
+                  <td className="hide-mobile">{formatCurrency(account.initialBalance)}</td>
+                  <td>
+                    {balances[account._id] != null ? (
+                      formatCurrency(balances[account._id])
+                    ) : (
+                      <button className="btn btn-sm" onClick={() => loadBalance(account._id)}>
+                        Calcular
+                      </button>
+                    )}
+                  </td>
+                  <td>
+                    <button className="btn btn-sm btn-danger" onClick={() => handleDelete(account._id)}>
+                      Excluir
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </>
   );

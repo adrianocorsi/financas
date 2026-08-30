@@ -219,33 +219,35 @@ export function RendaPage() {
           sua esposa, se for o caso).
         </p>
       ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Descrição</th>
-              <th>Valor mensal</th>
-              <th>Dia do recebimento</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {fontes.map((fonte) => (
-              <tr key={fonte._id}>
-                <td>{fonte.description}</td>
-                <td>{formatCurrency(fonte.amount)}</td>
-                <td>{fonte.dayOfMonth}</td>
-                <td>
-                  <button className="btn btn-sm" onClick={() => openEditForm(fonte)}>
-                    Editar
-                  </button>{" "}
-                  <button className="btn btn-sm btn-danger" onClick={() => handleDelete(fonte._id)}>
-                    Excluir
-                  </button>
-                </td>
+        <div className="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Descrição</th>
+                <th>Valor mensal</th>
+                <th>Dia do recebimento</th>
+                <th>Ações</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {fontes.map((fonte) => (
+                <tr key={fonte._id}>
+                  <td>{fonte.description}</td>
+                  <td>{formatCurrency(fonte.amount)}</td>
+                  <td>{fonte.dayOfMonth}</td>
+                  <td>
+                    <button className="btn btn-sm" onClick={() => openEditForm(fonte)}>
+                      Editar
+                    </button>{" "}
+                    <button className="btn btn-sm btn-danger" onClick={() => handleDelete(fonte._id)}>
+                      Excluir
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </>
   );

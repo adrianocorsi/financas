@@ -126,3 +126,12 @@ export interface PendenciasAnteriores {
   total: number;
   entries: PendenciaAnterior[];
 }
+
+export interface ComparativoMensalPonto {
+  month: number;
+  year: number;
+  entradas: number;
+  saidas: number;
+  saldo: number;
+  variacaoPercentual: number | null;
+}

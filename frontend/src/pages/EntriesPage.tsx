@@ -245,9 +245,9 @@ export function EntriesPage() {
           {formatDate(entry.dueDate)} {entry.isRecurring && <span title="Lançamento recorrente">🔁</span>}
         </td>
         <td>{entry.description}</td>
-        <td>{accountById.get(entry.accountId)?.name ?? "—"}</td>
+        <td className="hide-mobile">{accountById.get(entry.accountId)?.name ?? "—"}</td>
         <td>{formatCurrency(entry.amountExpected)}</td>
-        <td>{entry.amountPaid != null ? formatCurrency(entry.amountPaid) : "—"}</td>
+        <td className="hide-mobile">{entry.amountPaid != null ? formatCurrency(entry.amountPaid) : "—"}</td>
         <td>
           <span className={`badge badge-${entry.status}`}>{STATUS_LABELS[entry.status]}</span>
         </td>
@@ -465,34 +465,36 @@ export function EntriesPage() {
             {recurrences.length === 0 ? (
               <p className="empty-state">Nenhuma recorrência cadastrada ainda</p>
             ) : (
-              <table>
-                <thead>
-                  <tr>
-                    <th>Descrição</th>
-                    <th>Valor</th>
-                    <th>Dia</th>
-                    <th>Frequência</th>
-                    <th>Início</th>
-                    <th>Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recurrences.map((r) => (
-                    <tr key={r._id}>
-                      <td>{r.description}</td>
-                      <td>{formatCurrency(r.amount)}</td>
-                      <td>{r.dayOfMonth}</td>
-                      <td>{FREQUENCY_LABELS[r.frequency]}</td>
-                      <td>{formatDate(r.startDate)}</td>
-                      <td>
-                        <button className="btn btn-sm btn-danger" onClick={() => handleDeleteRecurrence(r._id)}>
-                          Excluir
-                        </button>
-                      </td>
+              <div className="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Descrição</th>
+                      <th>Valor</th>
+                      <th>Dia</th>
+                      <th className="hide-mobile">Frequência</th>
+                      <th className="hide-mobile">Início</th>
+                      <th>Ações</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {recurrences.map((r) => (
+                      <tr key={r._id}>
+                        <td>{r.description}</td>
+                        <td>{formatCurrency(r.amount)}</td>
+                        <td>{r.dayOfMonth}</td>
+                        <td className="hide-mobile">{FREQUENCY_LABELS[r.frequency]}</td>
+                        <td className="hide-mobile">{formatDate(r.startDate)}</td>
+                        <td>
+                          <button className="btn btn-sm btn-danger" onClick={() => handleDeleteRecurrence(r._id)}>
+                            Excluir
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         )}
@@ -538,20 +540,22 @@ export function EntriesPage() {
                   {formatCurrency(totalPago)}
                 </span>
               </div>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Vencimento</th>
-                    <th>Descrição</th>
-                    <th>Conta</th>
-                    <th>Previsto</th>
-                    <th>Pago</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                  </tr>
-                </thead>
-                <tbody>{categoryEntries.map(renderEntryRow)}</tbody>
-              </table>
+              <div className="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Vencimento</th>
+                      <th>Descrição</th>
+                      <th className="hide-mobile">Conta</th>
+                      <th>Previsto</th>
+                      <th className="hide-mobile">Pago</th>
+                      <th>Status</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>{categoryEntries.map(renderEntryRow)}</tbody>
+                </table>
+              </div>
             </div>
           );
         })

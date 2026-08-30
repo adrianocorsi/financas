@@ -15,7 +15,7 @@ import {
 import { Link } from "react-router-dom";
 import { dashboardApi } from "../api/dashboard";
 import { MonthYearSelector } from "../components/common/MonthYearSelector";
-import { GastoPorCategoria, PendenciasAnteriores, ResumoMensal } from "../types";
+import { ComparativoMensalPonto, GastoPorCategoria, PendenciasAnteriores, ResumoMensal } from "../types";
 import { formatCurrency, formatCurrencyCompact, formatDate, MONTH_NAMES } from "../utils/format";
 
 const PALETTE = ["#2563eb", "#16a34a", "#f97316", "#8b5cf6", "#ec4899", "#0891b2", "#d97706", "#dc2626"];
@@ -57,7 +57,7 @@ function RoundedBar(props: any) {
   return <path d={d} fill={fill} fillOpacity={fillOpacity ?? 1} />;
 }
 
-function OrcadoRealizadoTooltip({ active, payload, label }: any) {
+function BarPairTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
     <div
@@ -88,6 +88,7 @@ export function DashboardPage() {
   const [resumo, setResumo] = useState<ResumoMensal | null>(null);
   const [gastos, setGastos] = useState<GastoPorCategoria[]>([]);
   const [orcadoRealizado, setOrcadoRealizado] = useState<OrcadoRealizadoPonto[]>([]);
+  const [comparativoAnual, setComparativoAnual] = useState<ComparativoMensalPonto[]>([]);
   const [pendencias, setPendencias] = useState<PendenciasAnteriores | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -108,8 +109,9 @@ export function DashboardPage() {
       dashboardApi.gastosPorCategoria(month, year),
       Promise.all(monthsWindow.map((p) => dashboardApi.resumoMensal(p.month, p.year))),
       dashboardApi.pendenciasAnteriores(month, year),
+      dashboardApi.comparativoMensal(year),
     ])
-      .then(([resumoData, gastosData, series, pendenciasData]) => {
+      .then(([resumoData, gastosData, series, pendenciasData, comparativoData]) => {
         setResumo(resumoData);
         setGastos(gastosData);
         setOrcadoRealizado(
@@ -121,6 +123,7 @@ export function DashboardPage() {
           }))
         );
         setPendencias(pendenciasData);
+        setComparativoAnual(comparativoData);
       })
       .finally(() => setLoading(false));
   }, [month, year]);
@@ -204,13 +207,13 @@ export function DashboardPage() {
             {gastos.length === 0 ? (
               <p className="empty-state">Sem despesas pagas neste mês</p>
             ) : (
-              <ResponsiveContainer width="100%" height={280}>
+              <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                   <Pie
                     data={gastos}
                     dataKey="total"
                     nameKey="categoryName"
-                    outerRadius={90}
+                    outerRadius={80}
                     label={(entry) => entry.categoryName ?? "Sem categoria"}
                   >
                     {gastos.map((entry, index) => (
@@ -226,7 +229,7 @@ export function DashboardPage() {
 
           <div className="card">
             <h3>Despesas: Orçado x Realizado (6 meses)</h3>
-            <ResponsiveContainer width="100%" height={280}>
+            <ResponsiveContainer width="100%" height={250}>
               <BarChart data={orcadoRealizado} barGap={2} barCategoryGap="32%" margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                 <CartesianGrid stroke={HAIRLINE} vertical={false} />
                 <XAxis
@@ -242,7 +245,7 @@ export function DashboardPage() {
                   tickLine={false}
                   tick={{ fill: MUTED_TEXT, fontSize: 12 }}
                 />
-                <Tooltip content={<OrcadoRealizadoTooltip />} cursor={{ fill: "rgba(11,11,11,0.03)" }} />
+                <Tooltip content={<BarPairTooltip />} cursor={{ fill: "rgba(11,11,11,0.03)" }} />
                 <Legend
                   iconType="plainline"
                   iconSize={16}
@@ -269,6 +272,59 @@ export function DashboardPage() {
               </BarChart>
             </ResponsiveContainer>
           </div>
+        </div>
+      )}
+
+      {!loading && (
+        <div className="card">
+          <h3>Receita x Despesa — {year} (ano)</h3>
+          <ResponsiveContainer width="100%" height={190}>
+            <BarChart
+              data={comparativoAnual}
+              barGap={2}
+              barCategoryGap="24%"
+              margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid stroke={HAIRLINE} vertical={false} />
+              <XAxis
+                dataKey={(p: ComparativoMensalPonto) => MONTH_NAMES[p.month - 1].slice(0, 3)}
+                axisLine={{ stroke: HAIRLINE }}
+                tickLine={false}
+                tick={{ fill: MUTED_TEXT, fontSize: 12 }}
+              />
+              <YAxis
+                tickFormatter={(v) => formatCurrencyCompact(v)}
+                width={64}
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: MUTED_TEXT, fontSize: 12 }}
+              />
+              <Tooltip content={<BarPairTooltip />} cursor={{ fill: "rgba(11,11,11,0.03)" }} />
+              <Legend
+                iconType="plainline"
+                iconSize={16}
+                formatter={(value) => <span style={{ color: MUTED_TEXT }}>{value}</span>}
+              />
+              <Bar
+                dataKey="entradas"
+                fill="#2563eb"
+                name="Receita"
+                shape={RoundedBar}
+                barSize={16}
+                activeBar={{ fillOpacity: 0.8 }}
+                isAnimationActive={false}
+              />
+              <Bar
+                dataKey="saidas"
+                fill="#dc2626"
+                name="Despesa"
+                shape={RoundedBar}
+                barSize={16}
+                activeBar={{ fillOpacity: 0.8 }}
+                isAnimationActive={false}
+              />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       )}
     </>

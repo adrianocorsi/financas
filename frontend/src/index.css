@@ -69,7 +69,12 @@ button {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 1rem;
+  padding: 0.85rem 1rem;
+}
+
+.card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
 }
 
 .app-shell {
@@ -114,15 +119,18 @@ button {
 
 .content {
   padding: 1.5rem 2rem;
-  max-width: 1200px;
+  max-width: 1400px;
   width: 100%;
+  min-width: 0; /* filho de grid não encolhe sozinho sem isso, e a tabela estoura a tela */
+  margin: 0 auto; /* sem isso, em telas largas o conteúdo trava no max-width mas fica
+                     colado à esquerda, deixando um vão vazio enorme do lado direito */
 }
 
 .page-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.85rem;
   flex-wrap: wrap;
   gap: 0.75rem;
 }
@@ -150,26 +158,26 @@ button {
 .grid-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
 }
 
 .stat-card .label {
   color: var(--text-muted);
-  font-size: 0.8rem;
-  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  margin: 0 0 0.25rem;
 }
 
 .stat-card .value {
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 600;
   margin: 0;
 }
 
 .stat-card .hint {
   color: var(--text-muted);
-  font-size: 0.75rem;
-  margin: 0.35rem 0 0;
+  font-size: 0.72rem;
+  margin: 0.25rem 0 0;
 }
 
 .value-positive {
@@ -183,8 +191,8 @@ button {
 .charts-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
 }
 
 @media (max-width: 900px) {
@@ -194,10 +202,60 @@ button {
   .app-shell {
     grid-template-columns: 1fr;
   }
+  .content {
+    padding: 1rem 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Abaixo de 640px a barra lateral vertical toma espaço demais — vira uma
+     faixa no topo. Os links QUEBRAM LINHA (nunca rolam) — squish em vez de
+     scroll, mesmo princípio das tabelas: tudo visível de cara, sem precisar
+     arrastar pra achar "Orçamentos"/"Contas"/"Categorias". */
+  .app-shell {
+    grid-template-rows: auto 1fr;
+  }
+  .sidebar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 0.6rem 0.75rem;
+    gap: 0.35rem 0.5rem;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar h1 {
+    margin: 0 0.5rem 0 0;
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+  .sidebar a {
+    padding: 0.3rem 0.55rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+  .sidebar .logout {
+    margin-top: 0;
+    margin-left: auto;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+  .content {
+    padding: 1rem;
+  }
+  .stat-card .value {
+    font-size: 1.2rem;
+  }
+}
+
+.table-scroll {
+  overflow-x: auto;
+  border-radius: var(--radius);
 }
 
 table {
   width: 100%;
+  min-width: 620px; /* evita colunas espremidas — o wrapper .table-scroll rola em vez de encolher */
   border-collapse: collapse;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -306,8 +364,8 @@ tr:last-child td {
   background: #fef2f2;
   border: 1px solid #fecaca;
   border-radius: var(--radius);
-  padding: 1rem 1.25rem;
-  margin-bottom: 1.5rem;
+  padding: 0.85rem 1.25rem;
+  margin-bottom: 0.85rem;
 }
 
 .alert-banner-header {
@@ -338,7 +396,8 @@ tr:last-child td {
 .alert-banner-list li {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.75rem;
   padding: 0.4rem 0;
   border-bottom: 1px dashed #fecaca;
   font-size: 0.85rem;
@@ -368,4 +427,36 @@ tr:last-child td {
   margin: 0.5rem 0 0;
   font-size: 0.8rem;
   color: var(--text-muted);
+}
+
+/* Precisa vir depois das regras base de table/th/td/badge/btn-sm acima —
+   mesma especificidade, então a ordem no arquivo decide quem ganha. */
+@media (max-width: 640px) {
+  /* Squish em vez de rolagem: as tabelas encolhem pra caber na tela, e as
+     colunas menos essenciais (marcadas com .hide-mobile em cada página) somem.
+     table-layout: fixed é o que realmente trava a largura total — sem isso o
+     layout "auto" do navegador estica a tabela pra evitar quebrar palavras/botões. */
+  table {
+    min-width: 0;
+    table-layout: fixed;
+    font-size: 0.74rem;
+  }
+  th,
+  td {
+    padding: 0.35rem 0.3rem;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+  .badge {
+    padding: 0.1rem 0.35rem;
+    font-size: 0.66rem;
+  }
+  .btn-sm {
+    padding: 0.2rem 0.35rem;
+    font-size: 0.7rem;
+    white-space: normal;
+  }
+  .hide-mobile {
+    display: none;
+  }
 }

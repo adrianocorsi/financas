@@ -1,5 +1,5 @@
 import { apiClient } from "./client";
-import { FluxoCaixaPonto, GastoPorCategoria, PendenciasAnteriores, ResumoMensal } from "../types";
+import { ComparativoMensalPonto, FluxoCaixaPonto, GastoPorCategoria, PendenciasAnteriores, ResumoMensal } from "../types";
 
 export const dashboardApi = {
   resumoMensal: (month: number, year: number) =>
@@ -18,7 +18,9 @@ export const dashboardApi = {
       .then((r) => r.data),
 
   comparativoMensal: (year: number) =>
-    apiClient.get("/dashboard/comparativo-mensal", { params: { year } }).then((r) => r.data),
+    apiClient
+      .get<ComparativoMensalPonto[]>("/dashboard/comparativo-mensal", { params: { year } })
+      .then((r) => r.data),
 
   projecaoSaldo: (monthsAhead: number) =>
     apiClient.get("/dashboard/projecao-saldo", { params: { months_ahead: monthsAhead } }).then((r) => r.data),
