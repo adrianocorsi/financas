@@ -3,15 +3,6 @@ import { Entry } from "../../models/Entry";
 import { Account } from "../../models/Account";
 import { toUTCDateOnly, utcDate } from "../../utils/dateOnly";
 
-// paidDate é coagida por z.coerce.date() a partir de string ISO ("2026-08-15"), interpretada em UTC.
-// O range do mês precisa ser construído em UTC também, senão lançamentos do dia 1 (ou próximos das
-// bordas do mês) vazam para o mês vizinho em qualquer timezone com offset negativo (ex: Brasil, UTC-3).
-function monthRange(month: number, year: number): { start: Date; end: Date } {
-  const start = utcDate(year, month, 1);
-  const end = month === 12 ? utcDate(year + 1, 1, 1) : utcDate(year, month + 1, 1); // exclusivo
-  return { start, end };
-}
-
 async function sumAmountExpected(userId: string, type: "receita" | "despesa", month: number, year: number) {
   const [result] = await Entry.aggregate([
     { $match: { userId: new Types.ObjectId(userId), type, competenceMonth: month, competenceYear: year } },
@@ -20,15 +11,19 @@ async function sumAmountExpected(userId: string, type: "receita" | "despesa", mo
   return result?.total ?? 0;
 }
 
+// "Realizado" soma pela COMPETÊNCIA do lançamento, não pela data em que foi pago (paidDate).
+// Decisão explícita do usuário: uma conta de agosto paga com atraso em setembro deve continuar
+// contando no "Realizado" de agosto (simétrico com "Orçado", que também é por competência) —
+// não no mês em que o dinheiro efetivamente saiu, que seria a leitura de fluxo de caixa.
 async function sumAmountPaid(userId: string, type: "receita" | "despesa", month: number, year: number) {
-  const { start, end } = monthRange(month, year);
   const [result] = await Entry.aggregate([
     {
       $match: {
         userId: new Types.ObjectId(userId),
         type,
         amountPaid: { $ne: null },
-        paidDate: { $gte: start, $lt: end },
+        competenceMonth: month,
+        competenceYear: year,
       },
     },
     { $group: { _id: null, total: { $sum: "$amountPaid" } } },
@@ -70,15 +65,14 @@ export async function gastosPorCategoria(
   year: number,
   type: "receita" | "despesa"
 ) {
-  const { start, end } = monthRange(month, year);
-
   return Entry.aggregate([
     {
       $match: {
         userId: new Types.ObjectId(userId),
         type,
         amountPaid: { $ne: null },
-        paidDate: { $gte: start, $lt: end },
+        competenceMonth: month,
+        competenceYear: year,
       },
     },
     {
